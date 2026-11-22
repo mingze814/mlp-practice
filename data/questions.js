@@ -5216,6 +5216,358 @@ window.QUESTIONS = [
 "zh": "早停≈岭：大曲率方向先被拟合，小曲率（平坦）方向仍接近 0。"
 },
 {
+"id": "L11-015",
+"lec": "L11",
+"type": "term",
+"level": 1,
+"q": "The lecture sorts activation functions into three families by their slope $a'(s)$. Which list contains only **saturating** functions (slope $\\to0$ for large $\\lvert s\\rvert$)?",
+"choices": [
+"ReLU, leaky ReLU, softplus",
+"sigmoid, ReLU, tanh",
+"step, SiLU, GELU",
+"step, sigmoid, $\\tanh$"
+],
+"answer": 3,
+"why": "Step, sigmoid and tanh are flat in the tails. ReLU and leaky ReLU are kinked rectifiers (slope tends to 1 for $s\\to\\infty$); softplus, SiLU, GELU are smooth rectifiers, also with slope 1 for large $s$.",
+"zh": "饱和型：step、sigmoid、tanh；ReLU 类斜率趋于 1，不饱和。"
+},
+{
+"id": "L11-016",
+"lec": "L11",
+"type": "term",
+"level": 1,
+"q": "Which formula is the **SiLU** activation (sig = logistic sigmoid, $\\Phi$ = normal CDF)?",
+"choices": [
+"$s\\,\\operatorname{sig}(s)$",
+"$\\operatorname{sig}(s)$",
+"$s\\,\\Phi(s)$",
+"$\\ln(1+e^{s})$"
+],
+"answer": 0,
+"why": "SiLU is $s$ times the sigmoid. $s\\Phi(s)$ is GELU, $\\ln(1+e^s)$ is softplus, and $\\operatorname{sig}(s)$ alone is the saturating sigmoid.",
+"zh": "SiLU = $s\\cdot\\mathrm{sig}(s)$；GELU 用 $\\Phi$，softplus 是 $\\ln(1+e^s)$。"
+},
+{
+"id": "L11-017",
+"lec": "L11",
+"type": "term",
+"level": 1,
+"q": "What is the derivative $\\frac{d}{ds}\\ln(1+e^{s})$ of the softplus function?",
+"choices": [
+"$\\tanh(s)$",
+"$\\operatorname{sig}(s)=\\frac{1}{1+e^{-s}}$",
+"$\\frac{1}{1+e^{s}}$",
+"$e^{s}$"
+],
+"answer": 1,
+"why": "The chain rule gives $e^s/(1+e^s)=1/(1+e^{-s})$, the sigmoid. C is $\\operatorname{sig}(-s)$, with the wrong sign of the exponent. Hence softplus is a smooth ReLU, since ReLU' is a step.",
+"zh": "softplus 的导数就是 sigmoid，所以它是 ReLU 的光滑版。"
+},
+{
+"id": "L11-018",
+"lec": "L11",
+"type": "term",
+"level": 2,
+"q": "Which statement about the derivative of the logistic sigmoid is correct?",
+"choices": [
+"$\\operatorname{sig}'=\\operatorname{sig}(1-\\operatorname{sig})\\le\\frac14$, maximal at $s=0$",
+"$\\operatorname{sig}'=\\operatorname{sig}(1-\\operatorname{sig})\\le1$, maximal at $s=0$",
+"$\\operatorname{sig}'=\\operatorname{sig}^2\\le\\frac14$, maximal at $s=0$",
+"$\\operatorname{sig}'=1-\\operatorname{sig}^2\\le1$, maximal at $s=0$"
+],
+"answer": 0,
+"why": "$\\operatorname{sig}'(0)=\\frac12\\cdot\\frac12=\\frac14$ is the maximum. D is the tanh derivative $1-\\tanh^2$ with maximum 1. This bound $\\frac14$ is the reason for vanishing gradients.",
+"zh": "$\\mathrm{sig}'=\\mathrm{sig}(1-\\mathrm{sig})\\le1/4$；tanh 的才是 $1-\\tanh^2\\le1$。"
+},
+{
+"id": "L11-019",
+"lec": "L11",
+"type": "term",
+"level": 2,
+"q": "$X\\in\\mathbb R^{p\\times n}$ with $p>n$ has independent columns, and $X^Tw=y$ has many exact solutions. Which expression is the one of minimum $\\lVert w\\rVert$?",
+"choices": [
+"$(XX^T)^{-1}Xy$",
+"$X(X^TX)^{-1}y$",
+"$X^T(XX^T)^{-1}y$",
+"$(X^TX)^{-1}X^Ty$"
+],
+"answer": 1,
+"why": "The minimiser lies in the column space of $X$, $w=Xc$, so $X^TXc=y$ and $w=X(X^TX)^{-1}y=(X^T)^{+}y$. A is OLS, but $XX^T$ ($p\\times p$) is singular for $p>n$. C and D have wrong shapes.",
+"zh": "最小范数解 $w=X(X^TX)^{-1}y$：在 $X$ 的列空间里，需要 $X^TX$ 可逆。"
+},
+{
+"id": "L11-020",
+"lec": "L11",
+"type": "pic",
+"level": 2,
+"q": "A network predicts the potential energy $E(\\mathbf r)$ of a molecule; forces are $F=-\\nabla_{\\mathbf r}E$, and MD needs forces that change continuously with $\\mathbf r$. Which hidden activation is the better choice?",
+"choices": [
+"ReLU, because it is cheap and does not saturate",
+"step function, because energies are quantized",
+"SiLU, because it is smooth, so $\\nabla E$ is continuous",
+"ReLU, because its piecewise-linear $E$ gives exact forces"
+],
+"answer": 2,
+"why": "With ReLU, $E$ is piecewise linear in $\\mathbf r$, so the forces jump between regions (and curvature is zero). SiLU $x\\,\\sigma(x)$ is smooth, giving continuous forces; this is why ML force fields use it.",
+"zh": "力场要连续的力 $-\\nabla E$：ReLU 使 $E$ 分段线性、力跳变；SiLU 光滑。"
+},
+{
+"id": "L11-021",
+"lec": "L11",
+"type": "term",
+"level": 3,
+"q": "Why does gradient descent started at $w_0=0$ on $\\tfrac12\\lVert X^Tw-y\\rVert^2$ with $p>n$ converge to the **minimum-norm** interpolant?",
+"choices": [
+"The gradient $X(X^Tw-y)$ always lies in the column space of $X$: no null-space part",
+"The gradient is orthogonal to the column space, so $\\lVert w\\rVert$ stays small",
+"The minibatch noise of GD averages out and shrinks $\\lVert w\\rVert$",
+"The loss has a unique minimiser when $p>n$, and GD finds it"
+],
+"answer": 0,
+"why": "Every update adds a vector from the column space of $X$. At convergence $w$ is an exact fit lying in that space, which is $X(X^TX)^{-1}y$. D is false: for $p>n$ the minimiser is a whole line or plane.",
+"zh": "GD 的梯度总在 $X$ 的列空间内，从 0 出发不会产生零空间分量 → 最小范数解。"
+},
+{
+"id": "L11-022",
+"lec": "L11",
+"type": "calc",
+"level": 2,
+"q": "$\\operatorname{SiLU}(s)=s\\,\\operatorname{sig}(s)$. What is $\\operatorname{SiLU}(-1)$? (Use $\\operatorname{sig}(1)=0.731$.)",
+"choices": [
+"$-0.731$",
+"$+0.269$",
+"$-0.269$",
+"$-0.500$"
+],
+"answer": 2,
+"why": "$\\operatorname{sig}(-1)=1-0.731=0.269$, so $\\operatorname{SiLU}(-1)=-1\\cdot0.269=-0.269$. A forgets that $\\operatorname{sig}(-1)\\ne\\operatorname{sig}(1)$; B drops the factor $s=-1$.",
+"zh": "SiLU(−1)=−1·sig(−1)=−0.269：负半轴略低于 0，非单调。"
+},
+{
+"id": "L11-023",
+"lec": "L11",
+"type": "calc",
+"level": 2,
+"q": "$\\operatorname{GELU}(s)=s\\,\\Phi(s)$ with $\\Phi$ the standard normal CDF, $\\Phi(1)=0.841$. What is $\\operatorname{GELU}(-1)$?",
+"choices": [
+"$-0.159$",
+"$-0.841$",
+"$+0.159$",
+"$-0.269$"
+],
+"answer": 0,
+"why": "$\\Phi(-1)=1-\\Phi(1)=0.159$, hence $\\operatorname{GELU}(-1)=-1\\cdot0.159=-0.159$. B uses $\\Phi(1)$; D is the SiLU value at $-1$.",
+"zh": "$\\Phi(-1)=1-\\Phi(1)=0.159$，GELU(−1)=−0.159。"
+},
+{
+"id": "L11-024",
+"lec": "L11",
+"type": "calc",
+"level": 1,
+"q": "A line $y=w_0+w_1x$ is fitted exactly through the two points $(2,4)$ and $(3,9)$. What is $\\lVert w\\rVert$ of the weight vector $w=(w_0,w_1)$?",
+"choices": [
+"$5.00$",
+"$61$",
+"$7.81$",
+"$3.00$"
+],
+"answer": 2,
+"why": "Slope $w_1=5$, intercept $w_0=4-10=-6$, so $\\lVert w\\rVert=\\sqrt{36+25}=\\sqrt{61}=7.81$. B forgets the square root; A is the slope alone.",
+"zh": "过两点的直线 $w=(-6,5)$，范数 $\\sqrt{61}=7.81$，$p=n$ 时范数很大。"
+},
+{
+"id": "L11-025",
+"lec": "L11",
+"type": "calc",
+"level": 3,
+"q": "Data $(2,4),(3,9)$, features $(1,x,x^2)$. The minimum-norm fit is $\\hat w=\\frac1{62}(-6,5,61)^T$. Its prediction at $x=1$ (true $y=1$) is, to two decimals,",
+"choices": [
+"$-1.00$",
+"$0.97$",
+"$1.00$",
+"$0.98$"
+],
+"answer": 1,
+"why": "$\\hat w^T(1,1,1)^T=\\frac{-6+5+61}{62}=\\frac{60}{62}=0.968$. A is the two-parameter line $-6+5\\cdot1$. D keeps only the $x^2$ weight $61/62$. C is the truth, which the fit only approximates.",
+"zh": "$\\hat y(1)=60/62=0.97$；直线给 −1，最小范数解外推好得多。"
+},
+{
+"id": "L11-026",
+"lec": "L11",
+"type": "calc",
+"level": 3,
+"q": "All exact fits of $(2,4),(3,9)$ with features $(1,x,x^2)$ are $w(t)=(-6,5,0)+t\\,(6,-5,1)$. At which $t$ is $\\lVert w(t)\\rVert$ smallest?",
+"choices": [
+"$t=1$",
+"$t=1/2$",
+"$t=62/61$",
+"$t=61/62$"
+],
+"answer": 3,
+"why": "$\\lVert w\\rVert^2$ is minimal where $w\\perp d=(6,-5,1)$: $t=-w_0\\!\\cdot d/\\lVert d\\rVert^2=61/62$. $t=1$ is the true parameter $(0,0,1)$ with norm 1, slightly longer than $0.992$.",
+"zh": "取直线上离原点最近的点：$t=61/62$，不是真参数 $t=1$。"
+},
+{
+"id": "L11-027",
+"lec": "L11",
+"type": "calc",
+"level": 3,
+"q": "Per-sample gradients on $N=4$ samples are $g_i=2,4,6,8$. A minibatch of $B=2$ is drawn without replacement and $g_B$ is their mean. What is the variance of $g_B$ over all 6 possible batches?",
+"choices": [
+"$5.00$",
+"$2.50$",
+"$3.33$",
+"$1.67$"
+],
+"answer": 3,
+"why": "Batch means are $3,4,5,5,6,7$ (mean 5, unbiased), variance $10/6=1.67$. B is $\\sigma^2/B$ for drawing with replacement; A is the single-sample variance $5$.",
+"zh": "小批量梯度无偏，方差 $10/6$；有放回的 $\\sigma^2/B=2.5$ 是错的。"
+},
+{
+"id": "L11-028",
+"lec": "L11",
+"type": "calc",
+"level": 2,
+"q": "Backprop through 10 sigmoid layers. Ignore the weights and use the **largest** possible slope in every layer. By what factor is the error signal reduced at most?",
+"choices": [
+"$10^{-3}$",
+"$10^{-6}$",
+"$10^{-10}$",
+"$2.5$"
+],
+"answer": 1,
+"why": "Each layer multiplies by $\\operatorname{sig}'\\le\\frac14$, so the product is at most $4^{-10}=9.5\\times10^{-7}\\approx10^{-6}$. A would be $2^{-10}$, a factor $\\frac12$ per layer.",
+"zh": "每层最多乘 1/4：$4^{-10}\\approx10^{-6}$，这就是梯度消失。"
+},
+{
+"id": "L11-029",
+"lec": "L11",
+"type": "pic",
+"level": 1,
+"q": "Double-well loss with a shallow minimum next to the start and a deeper one behind a ridge. Same $\\eta$ and number of steps. What does the typical picture show?",
+"choices": [
+"GD and SGD both end in the deeper minimum",
+"GD ends in the nearby shallow minimum, noisy SGD may cross the ridge to the deeper one",
+"GD crosses the ridge, SGD stays in the shallow minimum",
+"Both stay in the shallow minimum and oscillate"
+],
+"answer": 1,
+"why": "GD follows the exact downhill direction into the nearest basin. The gradient noise of SGD acts like a temperature and can push the iterate over the ridge. It is one illustrative run, not a guarantee.",
+"zh": "GD 滑进最近的浅谷；SGD 噪声像温度，可能越过山脊到更深的谷。"
+},
+{
+"id": "L11-030",
+"lec": "L11",
+"type": "pic",
+"level": 2,
+"q": "In the double-well picture the SGD learning rate is made much smaller (less noise per step). What does the SGD path most likely look like now?",
+"choices": [
+"It still crosses the ridge, as SGD always finds the deeper minimum",
+"It becomes chaotic and diverges",
+"It stays in the first basin, close to the GD path",
+"It jumps back and forth between both minima forever"
+],
+"answer": 2,
+"why": "The noise kicks scale with $\\eta$, so a small $\\eta$ gives a smooth path that follows the gradient into the nearest basin. SGD finding the deeper minimum is a tendency, not a law.",
+"zh": "噪声幅度随 $\\eta$ 变小，SGD 几乎等同 GD，留在第一个谷。"
+},
+{
+"id": "L11-031",
+"lec": "L11",
+"type": "pic",
+"level": 2,
+"q": "Plot SiLU and GELU for $s\\in[-4,4]$ next to ReLU. Which description fits?",
+"choices": [
+"Monotone increasing, always above ReLU",
+"Smooth ReLU look-alikes that dip slightly below 0 near $s\\approx-1$, then return to 0",
+"Saturating at $\\pm1$ like tanh",
+"Zero for $s<0$ and linear for $s>0$, with a rounded kink"
+],
+"answer": 1,
+"why": "Both are ReLU with the kink rounded off, but they are not monotone: SiLU has a minimum $\\approx-0.28$, GELU $\\approx-0.17$. D would be softplus, which stays positive.",
+"zh": "SiLU/GELU：光滑 ReLU，负半轴有一个小凹坑（约 −0.28/−0.17）后回到 0。"
+},
+{
+"id": "L11-032",
+"lec": "L11",
+"type": "pic",
+"level": 2,
+"q": "Why did ReLU replace sigmoid and tanh as the default hidden activation in deep networks?",
+"choices": [
+"Its derivative is 1 for active units, so gradients do not shrink layer by layer",
+"It is bounded, which keeps activations from exploding",
+"It is smooth everywhere, so gradient descent converges faster",
+"Its output has zero mean, which centres the next layer's input"
+],
+"answer": 0,
+"why": "Backprop multiplies one activation slope per layer; $\\sigma'\\le1/4$ makes the product vanish in deep nets, while ReLU passes slope 1 where active. ReLU is unbounded, not smooth at 0 and not zero-mean, so B–D are false.",
+"zh": "ReLU 激活区斜率为 1，深层反传不衰减；sigmoid 斜率 ≤1/4 导致梯度消失。"
+},
+{
+"id": "L11-033",
+"lec": "L11",
+"type": "pic",
+"level": 2,
+"q": "Why did the perceptron's step activation $\\mathbf 1[s>0]$ disappear once networks were trained by gradient descent?",
+"choices": [
+"It saturates at 1, so outputs cannot be large",
+"It is not defined at $s=0$ for any input",
+"It gives negative outputs, which break the loss",
+"Its slope is $0$ almost everywhere, so gradients carry no signal for the weights"
+],
+"answer": 3,
+"why": "The step is flat except at the jump, so the chain rule gives zero gradients to all earlier layers. Sigmoid and tanh are smooth versions of it with usable slope, which made backprop possible.",
+"zh": "step 几乎处处斜率为 0，梯度无信息；sigmoid/tanh 是它的光滑版本。"
+},
+{
+"id": "L11-034",
+"lec": "L11",
+"type": "pic",
+"level": 2,
+"q": "$p=3$ weights, $n=2$ observations $x_i^Tw=y_i$. Which picture describes the minimum-norm solution in weight space $\\mathbb R^3$?",
+"choices": [
+"The point where the two planes meet the origin",
+"The single intersection point of two planes, where the fit is unique",
+"The point on the line where the two planes intersect that is closest to the origin",
+"The point on one plane closest to the origin"
+],
+"answer": 2,
+"why": "Each observation is a plane, and two planes meet in a line of exact fits. The circle around the origin that just touches this line gives $\\hat w$. For $p=n$ the planes meet in one point, possibly far away (norm 7.81).",
+"zh": "每个样本一个平面，交成一条线；最小范数解 = 线上离原点最近的点。"
+},
+{
+"id": "L11-035",
+"lec": "L11",
+"type": "pic",
+"level": 2,
+"q": "Minimum-norm least-squares fits with $p$ features on $n=18$ noisy samples. As $p$ grows, where do you expect the test-error peak, and what happens beyond it?",
+"choices": [
+"Peak at $p=18$; the error falls again for $p>18$",
+"Peak at $p=2n$; the error keeps growing beyond it",
+"No peak: the error falls monotonically",
+"Peak at $p=1$; the error rises beyond it"
+],
+"answer": 0,
+"why": "At $p=n$ the feature matrix is square and nearly singular, so $1/s_k$ amplifies noise and $\\lVert w\\rVert$ peaks too. Beyond the interpolation threshold, minimum norm picks the tamest interpolant: double descent.",
+"zh": "双下降：峰在插值阈值 $p=n$（$X$ 近奇异），$p>n$ 后误差再次下降。"
+},
+{
+"id": "L11-036",
+"lec": "L11",
+"type": "pic",
+"level": 3,
+"q": "A particle energy $E_\\theta(x)$ is a ReLU network, and forces are $-\\nabla_xE$. What does a force-versus-$x$ plot look like, and what fixes it?",
+"choices": [
+"Piecewise constant with jumps; a smooth activation (SiLU) makes forces continuous",
+"Smooth everywhere; no fix needed",
+"Linear in $x$; use a step function",
+"Piecewise constant with jumps; use a sigmoid output to clip it"
+],
+"answer": 0,
+"why": "A ReLU net is piecewise linear in $x$, so $\\nabla_xE$ is piecewise constant and jumps at the kinks. SiLU gives a $C^\\infty$ energy with continuous forces, hence its use in force fields.",
+"zh": "ReLU 网络分段线性 → 力有跳变；SiLU 光滑 → 力连续，故用于力场。"
+},
+{
 "id": "L12-001",
 "lec": "L12",
 "type": "term",
@@ -5236,32 +5588,32 @@ window.QUESTIONS = [
 "lec": "L12",
 "type": "term",
 "level": 1,
-"q": "Scalar loss $L$, $z_2=W_2a_1+b_2$ with $W_2\\in\\mathbb R^{K\\times h}$, $a_1\\in\\mathbb R^h$, and error row $\\delta_2=\\partial L/\\partial z_2\\in\\mathbb R^{1\\times K}$. Which expression is $\\partial L/\\partial W_2$, arranged like $W_2$?",
+"q": "Scalar loss $\\ell$, $s^2=W^2z^1+b^2$ with $W^2\\in\\mathbb R^{K\\times q}$, $z^1\\in\\mathbb R^q$, and adjoint row $\\bar s^2=\\partial\\ell/\\partial s^2\\in\\mathbb R^{1\\times K}$. Which expression is $\\partial\\ell/\\partial W^2$, arranged like $W^2$?",
 "choices": [
-"$\\delta_2^Ta_1^T$, shape $K\\times h$",
-"$a_1\\delta_2$, shape $h\\times K$",
-"$W_2^T\\delta_2^T$, shape $h\\times1$",
-"$\\delta_2W_2$, shape $1\\times h$"
+"$(\\bar s^2)^T(z^1)^T$, shape $K\\times q$",
+"$z^1\\bar s^2$, shape $q\\times K$",
+"$(W^2)^T(\\bar s^2)^T$, shape $q\\times1$",
+"$\\bar s^2W^2$, shape $1\\times q$"
 ],
 "answer": 0,
-"why": "$\\partial z_{2,i}/\\partial W_{2,ij}=a_{1,j}$, so the gradient is the outer product (error at the output)$^T\\times$(activation at the input)$^T$. B is its transpose, C and D are backprop to $a_1$.",
-"zh": "$\\partial L/\\partial W_2=\\delta_2^Ta_1^T$：输出端误差与输入端激活的外积。"
+"why": "$\\partial s^2_i/\\partial W^2_{ij}=z^1_j$, so $\\partial\\ell/\\partial W^2_{ij}=\\bar s^2_iz^1_j$: an outer product (adjoint)$^T\\times$(input)$^T$. B is its transpose; C and D belong to backprop to $z^1$.",
+"zh": "$\\partial\\ell/\\partial W^l=(\\bar s^l)^T(z^{l-1})^T$：本层 adjoint 与输入的外积，形状同 $W^l$。"
 },
 {
 "id": "L12-003",
 "lec": "L12",
 "type": "term",
 "level": 2,
-"q": "With column errors $g_2=\\delta_2^T\\in\\mathbb R^K$, $a_1=\\varphi(z_1)$ and $z_2=W_2a_1+b_2$, which formula gives $g_1=\\delta_1^T\\in\\mathbb R^h$?",
+"q": "Column errors $g^l=(\\bar s^l)^T$, $z^1=a(s^1)$ elementwise, $s^2=W^2z^1+b^2$ with $W^2\\in\\mathbb R^{K\\times q}$, $g^2\\in\\mathbb R^K$. Which formula gives $g^1\\in\\mathbb R^q$?",
 "choices": [
-"$W_2\\,(\\varphi'(z_1)\\odot g_2)$",
-"$\\varphi'(z_1)\\odot(W_2^Tg_2)$",
-"$\\varphi'(z_1)\\odot(W_2g_2)$",
-"$W_2^T\\,(\\varphi'(z_1)\\odot g_2)$"
+"$W^2\\,(a'(s^1)\\odot g^2)$",
+"$a'(s^1)\\odot\\big((W^2)^Tg^2\\big)$",
+"$a'(s^1)\\odot(W^2g^2)$",
+"$(W^2)^T\\,(a'(s^1)\\odot g^2)$"
 ],
 "answer": 1,
-"why": "Errors go backwards through the **transposed** weights, $W_2^Tg_2\\in\\mathbb R^h$, then are gated elementwise by $\\varphi'(z_1)$. C and A have wrong shapes ($W_2g_2$ is not defined); D multiplies $\\varphi'\\in\\mathbb R^h$ with $g_2\\in\\mathbb R^K$.",
-"zh": "列向量形式：$g_1=\\varphi'(z_1)\\odot(W_2^Tg_2)$，误差经转置权重向后传。"
+"why": "The row rule $\\bar z^1=\\bar s^2W^2$, $\\bar s^1=\\bar z^1\\operatorname{diag}(a'(s^1))$ becomes, in columns, $g^1=a'(s^1)\\odot((W^2)^Tg^2)$: transposed weights, then the gate. $W^2g^2$ (A, C) is undefined; D mixes $a'\\in\\mathbb R^q$ with $g^2\\in\\mathbb R^K$.",
+"zh": "列向量形式：$g^l=a'(s^l)\\odot((W^{l+1})^Tg^{l+1})$，误差经转置权重向后传。"
 },
 {
 "id": "L12-004",
@@ -5300,7 +5652,7 @@ window.QUESTIONS = [
 "lec": "L12",
 "type": "calc",
 "level": 2,
-"q": "1–1–1 network, input $x=2$, $W_1=0.5$, ReLU, $W_2=3$, no biases, target $y=1$, $L=\\tfrac12(\\hat y-y)^2$ with $\\hat y=z_2$. What is $\\partial L/\\partial W_1$?",
+"q": "1–1–1 network: $s^1=W^1x$, $z^1=\\mathrm{ReLU}(s^1)$, $s^2=W^2z^1$, $\\ell=\\tfrac12(s^2-y)^2$. With $x=2$, $W^1=0.5$, $W^2=3$, $y=1$, what is $\\partial\\ell/\\partial W^1$?",
 "choices": [
 "$12$",
 "$6$",
@@ -5308,8 +5660,8 @@ window.QUESTIONS = [
 "$18$"
 ],
 "answer": 0,
-"why": "Forward $z_1=1$, $a_1=1$, $\\hat y=3$. Backward $\\delta_2=2$, $\\delta_1=\\delta_2W_2\\varphi'(z_1)=6$, $\\partial L/\\partial W_1=\\delta_1x=12$. B forgets the input $x$, C forgets $W_2$.",
-"zh": "$\\partial L/\\partial W_1=\\delta_1x$，其中 $\\delta_1=\\delta_2W_2\\varphi'(z_1)$。"
+"why": "Forward $s^1=1$, $z^1=1$, $s^2=3$. Backward $\\bar s^2=s^2-y=2$, $\\bar z^1=\\bar s^2W^2=6$, $\\bar s^1=6\\cdot a'(1)=6$, $\\partial\\ell/\\partial W^1=\\bar s^1x=12$. B forgets the input $x$, C forgets $W^2$.",
+"zh": "$\\partial\\ell/\\partial W^1=\\bar s^1x$，其中 $\\bar s^1=\\bar s^2W^2a'(s^1)$。"
 },
 {
 "id": "L12-007",
@@ -5438,6 +5790,422 @@ window.QUESTIONS = [
 "answer": 2,
 "why": "Starting from the $1\\times1$ output, every product stays a row vector, so one sweep gives all $N$ partials; the price is memory for the forward activations. A describes forward mode.",
 "zh": "反向模式：从输出端出发，中间量是行向量 $\\delta$，代价约 2–3 次前向，需存激活。"
+},
+{
+"id": "L12-015",
+"lec": "L12",
+"type": "calc",
+"level": 1,
+"q": "Graph $u=wx$, $s=u+b$, $\\ell=(y-s)^2$ with $w=2$, $x=3$, $b=1$, $y=8$. A backward sweep starts with $\\bar s=\\partial\\ell/\\partial s=-2$. What is $\\partial\\ell/\\partial w$?",
+"choices": [
+"$-6$",
+"$6$",
+"$-2$",
+"$-4$"
+],
+"answer": 0,
+"why": "Forward $u=6$, $s=7$. Local derivatives: $\\partial s/\\partial u=1$, $\\partial u/\\partial w=x=3$, so $\\bar w=(-2)(1)(3)=-6$. C forgets the factor $x$; D uses $w$ instead of $x$ (that is $\\partial\\ell/\\partial x$).",
+"zh": "沿路径把局部导数相乘：$(-2)\\cdot1\\cdot x=-6$。"
+},
+{
+"id": "L12-016",
+"lec": "L12",
+"type": "calc",
+"level": 2,
+"q": "Graph $u=wx$, $s=u+b$, $\\ell=(y-s)^2$ with $w=3$, $x=2$, $b=1$, $y=4$. Backward sweep: what is the adjoint $\\bar x=\\partial\\ell/\\partial x$?",
+"choices": [
+"$12$",
+"$6$",
+"$18$",
+"$-18$"
+],
+"answer": 2,
+"why": "Forward $u=6$, $s=7$. Seed $\\bar s=-2(y-s)=6$, $\\bar u=\\bar s\\cdot1=6$, $\\bar x=\\bar u\\,\\partial u/\\partial x=6w=18$. A is $\\bar w=\\bar ux=12$ (the other leaf); B stops at $\\bar s$; D has a sign slip in $\\bar s$.",
+"zh": "$\\bar x=\\bar u\\,w$，$\\bar w=\\bar u\\,x$：对一个乘法节点，乘以\"另一个\"因子。"
+},
+{
+"id": "L12-017",
+"lec": "L12",
+"type": "term",
+"level": 1,
+"q": "Node $v_i$ is computed from its parents; $\\bar v_i=\\partial\\ell/\\partial v_i$ is its adjoint. Which rule computes the adjoint of $v_i$ in the backward pass?",
+"choices": [
+"$\\bar v_i=\\prod_{j\\in\\text{children}(i)}\\bar v_j\\,\\partial v_j/\\partial v_i$",
+"$\\bar v_i=\\sum_{j\\in\\text{children}(i)}\\bar v_j\\,\\partial v_j/\\partial v_i$",
+"$\\bar v_i=\\sum_{j\\in\\text{parents}(i)}\\bar v_j\\,\\partial v_i/\\partial v_j$",
+"$\\bar v_i=\\sum_{j\\in\\text{children}(i)}\\partial v_j/\\partial v_i$"
+],
+"answer": 1,
+"why": "$\\ell$ depends on $v_i$ through every child $j$, so the contributions $\\bar v_j\\,\\partial v_j/\\partial v_i$ add up (seed $\\bar\\ell=1$). A multiplies instead of summing, C runs over parents, D drops the downstream adjoint.",
+"zh": "adjoint 规则：对所有子节点求和 $\\sum_j\\bar v_j\\,\\partial v_j/\\partial v_i$，种子 $\\bar\\ell=1$。"
+},
+{
+"id": "L12-018",
+"lec": "L12",
+"type": "term",
+"level": 1,
+"q": "In the layered network, $s^l=W^lz^{l-1}+b^l\\in\\mathbb R^q$ and $\\ell$ is a scalar. In numerator layout, what is the shape of the adjoint $\\bar s^l=\\partial\\ell/\\partial s^l$?",
+"choices": [
+"$q\\times1$ (column)",
+"$q\\times q$",
+"$1\\times1$",
+"$1\\times q$ (row)"
+],
+"answer": 3,
+"why": "A derivative of a scalar by a $q$-vector is a $1\\times q$ row in numerator layout; the gradient $\\nabla_{s^l}\\ell=(\\bar s^l)^T$ is the column. Rows multiply Jacobians from the left: row $\\times$ matrix.",
+"zh": "数值分子布局下 adjoint 是 $1\\times q$ 行向量；梯度才是列向量。"
+},
+{
+"id": "L12-019",
+"lec": "L12",
+"type": "term",
+"level": 2,
+"q": "For the elementwise activation $z^l=a(s^l)$ with $s^l,z^l\\in\\mathbb R^q$, what is the Jacobian $\\partial z^l/\\partial s^l$ used in the backward pass?",
+"choices": [
+"$\\operatorname{diag}\\big(a'(s^l)\\big)$, a $q\\times q$ diagonal matrix",
+"$\\operatorname{diag}\\big(a(s^l)\\big)$, a $q\\times q$ diagonal matrix",
+"$(W^l)^T$, a $q\\times q$ matrix",
+"$a'(s^l)$ as a $1\\times q$ row"
+],
+"answer": 0,
+"why": "Each $z_k$ depends only on $s_k$, with derivative $a'(s_k)$, so off-diagonal entries vanish. The matrix product $s^l=W^lz^{l-1}$ has Jacobian $W^l$ with respect to $z^{l-1}$.",
+"zh": "逐元素激活的 Jacobian 是对角阵 $\\operatorname{diag}(a'(s^l))$。"
+},
+{
+"id": "L12-020",
+"lec": "L12",
+"type": "term",
+"level": 2,
+"q": "With $\\bar s^{l+1}\\in\\mathbb R^{1\\times m}$, $W^{l+1}\\in\\mathbb R^{m\\times q}$, $s^{l+1}=W^{l+1}z^l+b^{l+1}$, $z^l=a(s^l)$. Which row formula gives $\\bar s^l$?",
+"choices": [
+"$\\bar s^{l+1}\\operatorname{diag}\\big(a'(s^{l+1})\\big)W^{l+1}$",
+"$\\operatorname{diag}\\big(a'(s^l)\\big)\\,W^{l+1}\\bar s^{l+1}$",
+"$\\bar s^{l+1}\\,W^{l+1}\\operatorname{diag}\\big(a'(s^l)\\big)$",
+"$\\bar s^{l+1}\\,(W^{l+1})^T\\operatorname{diag}\\big(a'(s^l)\\big)$"
+],
+"answer": 2,
+"why": "Chain rule from the left: $\\bar z^l=\\bar s^{l+1}\\,\\partial s^{l+1}/\\partial z^l=\\bar s^{l+1}W^{l+1}$ ($1\\times q$), then $\\bar s^l=\\bar z^l\\operatorname{diag}(a'(s^l))$. B and D have impossible shapes; A uses the wrong layer's $a'$.",
+"zh": "行形式：$\\bar s^l=\\bar s^{l+1}W^{l+1}\\operatorname{diag}(a'(s^l))$，用本层的 $a'$。"
+},
+{
+"id": "L12-021",
+"lec": "L12",
+"type": "term",
+"level": 2,
+"q": "Which line of the glossary (automatic differentiation $\\leftrightarrow$ deep-learning code) is correct?",
+"choices": [
+"VJP: Jacobian times tangent; forward mode; `jax.jvp`",
+"VJP: adjoint row times Jacobian; reverse mode; `loss.backward()`",
+"JVP: adjoint row times Jacobian; reverse mode; `jax.vjp`",
+"VJP: adjoint row times Jacobian; forward mode; `loss.backward()`"
+],
+"answer": 1,
+"why": "The vector–Jacobian product multiplies a row from the left, which is exactly the reverse sweep (backpropagation). The Jacobian–vector product multiplies a tangent from the right: forward mode.",
+"zh": "VJP = 行向量×Jacobian = 反向模式 = `loss.backward()`；JVP = 前向模式。"
+},
+{
+"id": "L12-022",
+"lec": "L12",
+"type": "term",
+"level": 2,
+"q": "A simulator maps $N=3$ parameters to $M=10^5$ pixel values. You want the full $M\\times N$ Jacobian. Which choice is cheapest?",
+"choices": [
+"Reverse mode, one sweep",
+"Reverse mode, 3 sweeps",
+"Forward mode, $10^5$ sweeps",
+"Forward mode, 3 sweeps"
+],
+"answer": 3,
+"why": "A JVP sweep delivers one column of $J$, so forward mode needs $N=3$ sweeps; a VJP sweep delivers one row, so reverse mode would need $M=10^5$. Reverse mode wins only when outputs are few (a scalar loss).",
+"zh": "前向模式每次扫一列（$N$ 次），反向模式每次一行（$M$ 次）；输入少输出多用前向。"
+},
+{
+"id": "L12-023",
+"lec": "L12",
+"type": "term",
+"level": 3,
+"q": "Why does automatic differentiation not simply write $\\partial\\ell/\\partial W^1_{11}$ as one closed formula in inputs and parameters?",
+"choices": [
+"Shared sub-expressions (e.g. $s^1_1$) reappear many times; the formula grows with depth",
+"A closed formula is only approximate, backprop is exact",
+"One formula needs one forward pass per parameter",
+"AD stores no intermediate values, so it cannot reuse them"
+],
+"answer": 0,
+"why": "With names the derivative is short since $s^1_1$, $s^2$ are stored primals; written out, the same sum appears again and again (twice, then five times on the slide). AD computes with stored numbers instead. B and D are false.",
+"zh": "表达式膨胀：展开后共享子表达式反复出现；AD 只存一次 primal 并复用。"
+},
+{
+"id": "L12-024",
+"lec": "L12",
+"type": "term",
+"level": 2,
+"q": "Input $x\\in\\mathbb R^3$ and $s^1=W^1x+b^1\\in\\mathbb R^5$. In numerator layout, what is the shape of the Jacobian $\\partial s^1/\\partial x$?",
+"choices": [
+"$3\\times5$",
+"$5\\times5$",
+"$5\\times3$",
+"$1\\times5$"
+],
+"answer": 2,
+"why": "Rows index the output components ($5$), columns the input components ($3$): $[\\partial s/\\partial x]_{km}=\\partial s_k/\\partial x_m=W^1_{km}$, so the Jacobian equals $W^1$. A is the denominator layout.",
+"zh": "分子布局：Jacobian 是 输出维 × 输入维 = $5\\times3$，就是 $W^1$。"
+},
+{
+"id": "L12-025",
+"lec": "L12",
+"type": "calc",
+"level": 2,
+"q": "One weight is used twice: $u_1=2w$, $u_2=3w$, $s=u_1+u_2$, $\\ell=(s-10)^2$, at $w=1$. What is $\\partial\\ell/\\partial w$?",
+"choices": [
+"$-20$",
+"$-50$",
+"$-30$",
+"$-10$"
+],
+"answer": 1,
+"why": "$s=5$, $\\bar s=2(s-10)=-10$, $\\bar u_1=\\bar u_2=-10$. The leaf $w$ has two children, so $\\bar w=\\bar u_1\\cdot2+\\bar u_2\\cdot3=-50$ (adjoints add). A and C keep only one path; D forgets the local factors.",
+"zh": "共享变量：各条边的贡献相加，$\\bar w=-10\\cdot2-10\\cdot3=-50$。"
+},
+{
+"id": "L12-026",
+"lec": "L12",
+"type": "calc",
+"level": 3,
+"q": "Graph $u=x^2$, $\\ell=u\\cdot x$ (so $x$ feeds two nodes), evaluated at $x=2$. What is $\\partial\\ell/\\partial x$ from the backward sweep?",
+"choices": [
+"$8$",
+"$4$",
+"$16$",
+"$12$"
+],
+"answer": 3,
+"why": "$u=4$, $\\bar u=\\partial\\ell/\\partial u=x=2$. Child $u$ gives $\\bar u\\cdot2x=8$; child $\\ell$ (direct edge) gives $u=4$. Sum: $12=3x^2$. A forgets the direct edge, B only has the direct edge.",
+"zh": "$x$ 有两个子节点：$8+4=12$，等于 $d(x^3)/dx=3x^2$。"
+},
+{
+"id": "L12-027",
+"lec": "L12",
+"type": "calc",
+"level": 2,
+"q": "ReLU network, $x=(1,2)^T$, $W^1=\\begin{pmatrix}1&-1\\\\2&1\\end{pmatrix}$, $b^1=(0,-1)^T$, $W^2=(1\\ \\ 2)$, $b^2=0.5$, $y=3$, $\\ell=(y-s^2)^2$. Forward: $s^1=(-1,3)^T$, $s^2=6.5$. What is $\\bar s^1$?",
+"choices": [
+"$(0,\\ 14)$",
+"$(7,\\ 14)$",
+"$(14,\\ 0)$",
+"$(0,\\ 21)$"
+],
+"answer": 0,
+"why": "$\\bar s^2=-2(3-6.5)=7$, $\\bar z^1=\\bar s^2W^2=(7,14)$, and the gate $a'(s^1)=(0,1)$ since $s^1_1=-1<0$ gives $\\bar s^1=(0,14)$. B forgets the ReLU gate; C gates the wrong unit.",
+"zh": "$\\bar z^1=(7,14)$，乘 $\\operatorname{diag}(0,1)$ 得 $(0,14)$。"
+},
+{
+"id": "L12-028",
+"lec": "L12",
+"type": "calc",
+"level": 1,
+"q": "Same loss $\\ell=(y-s^L)^2$ as in the lecture, output $s^L=6.5$, label $y=3$. What is the seed $\\bar s^L=\\partial\\ell/\\partial s^L$ of the backward sweep?",
+"choices": [
+"$-7$",
+"$3.5$",
+"$7$",
+"$12.25$"
+],
+"answer": 2,
+"why": "$\\bar s^L=-2(y-s^L)=-2(3-6.5)=7$. A has the sign wrong, B forgets the factor 2, D is the loss value $\\ell$ itself, not its derivative.",
+"zh": "$\\bar s^L=-2(y-s^L)=7$；注意符号、系数 2，以及它不是损失值。"
+},
+{
+"id": "L12-029",
+"lec": "L12",
+"type": "calc",
+"level": 2,
+"q": "$x=1$, $s^1=W^1x+b^1$ with $W^1=2$, $b^1=-1$, $z^1=\\mathrm{ReLU}(s^1)$, $s^2=W^2z^1+b^2$ with $W^2=3$, $b^2=0.5$, $y=1$, $\\ell=(y-s^2)^2$. What is $\\partial\\ell/\\partial W^1$?",
+"choices": [
+"$5$",
+"$15$",
+"$7.5$",
+"$-15$"
+],
+"answer": 1,
+"why": "$s^1=1$, $z^1=1$, $s^2=3.5$. $\\bar s^2=-2(1-3.5)=5$, $\\bar z^1=5\\cdot3=15$, $\\bar s^1=15\\cdot1$, $\\partial\\ell/\\partial W^1=\\bar s^1x=15$. A forgets $W^2$; C forgets the 2 in the loss derivative; D has a sign slip.",
+"zh": "逐层：$\\bar s^2=5\\to\\bar z^1=15\\to\\bar s^1=15\\to\\bar W^1=15x$。"
+},
+{
+"id": "L12-030",
+"lec": "L12",
+"type": "calc",
+"level": 2,
+"q": "A network has $N=10^6$ parameters. One forward-mode tangent sweep costs about one forward pass and gives the derivative with respect to one parameter. About how many forward-pass equivalents does the full gradient cost in forward mode?",
+"choices": [
+"$3$",
+"$10^3$",
+"$10^{12}$",
+"$10^6$"
+],
+"answer": 3,
+"why": "One sweep per parameter gives $N\\approx10^6$ passes, whereas one reverse sweep costs about 2–3 forward passes (A) for the whole gradient. C would be the cost if each sweep cost $N$ passes.",
+"zh": "前向模式每个参数扫一次，约 $10^6$ 次；反向模式只需约 2–3 次前向的代价。"
+},
+{
+"id": "L12-031",
+"lec": "L12",
+"type": "calc",
+"level": 2,
+"q": "Hidden width $q=100$. Multiplying the row $\\bar z^l$ ($1\\times q$) with a dense $q\\times q$ Jacobian costs about $q^2$ operations; multiplying two $q\\times q$ matrices about $q^3$. How many times cheaper is the row-first order per layer?",
+"choices": [
+"$100$",
+"$10$",
+"$10^4$",
+"$2$"
+],
+"answer": 0,
+"why": "$q^3/q^2=q=100$. This is why backprop evaluates $\\bar s^LW^L\\operatorname{diag}(a')W^{L-1}\\cdots$ from the left (VJPs) and never forms matrix–matrix products.",
+"zh": "从左乘行向量每层 $O(q^2)$，矩阵乘矩阵 $O(q^3)$，省 $q=100$ 倍。"
+},
+{
+"id": "L12-032",
+"lec": "L12",
+"type": "pic",
+"level": 1,
+"q": "Picture the computation graph with the forward pass already done. How do the adjoints move in the backward pass?",
+"choices": [
+"From inputs to the loss, along the edges",
+"Both ways at once, meeting in the middle",
+"From the loss to the leaves along the reversed edges, starting from $\\bar\\ell=1$",
+"From the loss to the leaves along new edges that are different from the forward ones"
+],
+"answer": 2,
+"why": "Each node collects $\\bar v_j\\,\\partial v_j/\\partial v_i$ from its children, so information flows against the forward edges, in reverse topological order. A describes forward mode (tangents).",
+"zh": "反向传播：从损失出发，沿同一批边逆向，种子 $\\bar\\ell=1$，逆拓扑序。"
+},
+{
+"id": "L12-033",
+"lec": "L12",
+"type": "pic",
+"level": 2,
+"q": "For the current sample, a ReLU unit in a hidden layer has $s<0$. What does the backward pass look like at this unit?",
+"choices": [
+"The adjoint passes unchanged, but its weights are frozen",
+"The adjoint is blocked there; its incoming weights and bias get zero gradient",
+"Only its outgoing weights get zero gradient",
+"The adjoint at the unit doubles to compensate"
+],
+"answer": 1,
+"why": "$a'(s)=0$ in $\\operatorname{diag}(a'(s^l))$, so $\\bar s_k=0$. Then $\\bar W_{kj}=\\bar s_kz_j$ and $\\bar b_k=\\bar s_k$ vanish. Its outgoing weights use $\\bar s$ of the next layer times $z_k=0$, which is a different statement.",
+"zh": "ReLU 门：$a'=0$ 使该单元 $\\bar s_k=0$，入边权重和偏置梯度全为零。"
+},
+{
+"id": "L12-034",
+"lec": "L12",
+"type": "pic",
+"level": 3,
+"q": "Three hidden layers of 2 units each (pre-activations $s^1,s^2,s^3\\in\\mathbb R^2$) and a scalar output $s^4$. How many distinct paths from the loss back to the node $s^1_1$?",
+"choices": [
+"$2$",
+"$6$",
+"$8$",
+"$4$"
+],
+"answer": 3,
+"why": "From $s^1_1$ the signal goes to 2 units of layer 2, then 2 units of layer 3, then the output: $2\\cdot2=4$ paths. The count grows exponentially with depth; backprop sums them via $\\bar z$ without listing them.",
+"zh": "路径数随深度指数增长（$2\\cdot2=4$），反向传播通过 adjoint 一次性求和。"
+},
+{
+"id": "L12-035",
+"lec": "L12",
+"type": "pic",
+"level": 2,
+"q": "Compare memory of the two ways to get gradients through a deep network. Which picture is right?",
+"choices": [
+"Reverse mode stores all forward primals; forward mode keeps only the current layer",
+"Reverse mode needs no stored values, it recomputes them",
+"Forward mode must store all primals; reverse mode only the current layer",
+"Both store the same, since both use the same Jacobians"
+],
+"answer": 0,
+"why": "The backward sweep starts at the loss and needs every $s^l$, $z^l$ of the forward pass, so memory grows with depth. Forward mode moves in the same direction as the evaluation and can discard old values.",
+"zh": "反向模式必须存下所有前向 primal（内存代价）；前向模式可边算边丢。"
+},
+{
+"id": "L12-036",
+"lec": "L12",
+"type": "pic",
+"level": 2,
+"q": "Forward mode seeds the tangent $\\dot x=e_k$ at the inputs and propagates it forward through the graph. What does this single sweep deliver for $f:\\mathbb R^N\\to\\mathbb R^M$?",
+"choices": [
+"The whole Jacobian",
+"Row $j$ of $J$, one output's derivative w.r.t. all inputs",
+"Column $k$ of $J$: all outputs' derivatives w.r.t. input $x_k$",
+"The gradient of a scalar loss"
+],
+"answer": 2,
+"why": "A JVP computes $J\\dot x=Je_k$, the $k$-th column of the $M\\times N$ Jacobian. B is what a VJP sweep (reverse mode) gives. Hence forward mode costs $N$ sweeps for the whole $J$.",
+"zh": "JVP：$Je_k$ = 第 $k$ 列；VJP 才给一整行。"
+},
+{
+"id": "L12-037",
+"lec": "L12",
+"type": "pic",
+"level": 2,
+"q": "In the graph $\\ell=(y-wx-b)^2$ with $w=2$, $x=3$, $b=1$, $y=8$ (gradient $(\\bar w,\\bar b)=(-6,-2)$), take one GD step with $\\eta=0.1$. What happens to the prediction $s$ (currently 7)?",
+"choices": [
+"It moves towards 8 but stays below it",
+"It jumps to 9: overshoots the target and ends up with the same loss",
+"It lands exactly on 8",
+"It moves away from 8 (loss grows)"
+],
+"answer": 1,
+"why": "$w\\to2.6$, $b\\to1.2$, so $s=2.6\\cdot3+1.2=9.0$: the step changes $s$ by $3\\cdot0.6+0.2=2$ instead of the needed 1, an overshoot with $\\ell=1$ again.",
+"zh": "步长偏大：$s$ 从 7 跳到 9，越过目标 8，损失仍为 1。"
+},
+{
+"id": "L12-038",
+"lec": "L12",
+"type": "pic",
+"level": 2,
+"q": "A sample has input $x=(x_1,0)^T$ with $x_1\\neq0$. In $\\partial\\ell/\\partial W^1=(\\bar s^1)^T x^T$, what does the first-layer weight gradient look like?",
+"choices": [
+"Row 2 is zero",
+"The whole matrix is zero",
+"Only the entry $W^1_{22}$ is zero",
+"Column 2 is zero"
+],
+"answer": 3,
+"why": "$\\bar W^1_{kj}=\\bar s^1_k\\,x_j$ (\"error times input\"): column $j$ is scaled by $x_j$, so $x_2=0$ zeroes every weight fed by input 2. Rows are scaled by the adjoints $\\bar s^1_k$ instead.",
+"zh": "$\\bar W_{kj}=\\bar s_kx_j$：输入为 0 的那一列权重梯度全为零。"
+},
+{
+"id": "L12-039",
+"lec": "L12",
+"type": "pic",
+"level": 3,
+"q": "Doubling the number of layers doubles the parameters $N$ and the cost of a forward pass. What happens to the cost of the full gradient of a scalar loss?",
+"choices": [
+"Reverse mode $\\times2$; forward mode (one sweep per parameter) $\\times4$",
+"Reverse mode $\\times4$; forward mode $\\times2$",
+"Both $\\times2$",
+"Both $\\times4$"
+],
+"answer": 0,
+"why": "Reverse mode stays at $\\approx2$–$3$ forward passes, each now twice as expensive: $\\times2$. Forward mode needs $N$ sweeps (twice as many) and each is twice as expensive: $\\times4$.",
+"zh": "反向模式 $\\times2$，前向模式 $N$ 次扫描且每次翻倍，故 $\\times4$。"
+},
+{
+"id": "L12-040",
+"lec": "L12",
+"type": "pic",
+"level": 2,
+"q": "The 1–1–1 network $s^1=2x-1$, $z^1=\\mathrm{ReLU}(s^1)$, $s^2=3z^1+0.5$, $\\ell=(1-s^2)^2$ gets input $x=-1$. Which parameters get a nonzero gradient?",
+"choices": [
+"$W^1$, $b^1$, $W^2$, $b^2$ all",
+"$W^2$ and $b^2$ only",
+"$b^2$ only",
+"None"
+],
+"answer": 2,
+"why": "$s^1=-3<0$, so $z^1=0$, $s^2=0.5$, $\\bar s^2=-1$. Gate $a'=0$ kills $W^1$, $b^1$; $\\bar W^2=\\bar s^2z^1=0$ too since $z^1=0$. Only $\\bar b^2=\\bar s^2=-1$ survives.",
+"zh": "死单元：$z^1=0$ 使 $W^2$ 也无梯度，只剩输出偏置 $b^2$。"
 },
 {
 "id": "L13-001",
