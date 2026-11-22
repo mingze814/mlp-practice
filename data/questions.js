@@ -960,6 +960,38 @@ window.QUESTIONS = [
 "zh": "球面三角形内角和可达 270°，平面只有 180°，故无法保距压平。"
 },
 {
+"id": "L02-031",
+"lec": "L02",
+"type": "calc",
+"level": 2,
+"q": "UMAP on $N=1000$ observations $x_i\\in\\mathbb R^{10}$ into 2-D. Non-parametric: free $z_i\\in\\mathbb R^2$. Parametric: $z_i=f(x_i;\\theta)$, MLP $10\\to20\\to2$ with biases. Number of variables in each?",
+"choices": [
+"2000 and 240",
+"2000 and 262",
+"262 and 2000",
+"10000 and 262"
+],
+"answer": 1,
+"why": "Non-parametric: $2N=2000$ (grows with $N$). Parametric: $20\\cdot11+2\\cdot21=220+42=262$, independent of $N$. A forgets the biases ($200+40$), D counts $N\\cdot p$.",
+"zh": "非参数 $2N=2000$ 个变量；参数化只有 $\\theta$：$220+42=262$，与 $N$ 无关。"
+},
+{
+"id": "L02-032",
+"lec": "L02",
+"type": "pic",
+"level": 2,
+"q": "After training, a new observation $x_\\text{new}$ arrives. How is it embedded by parametric UMAP versus non-parametric UMAP?",
+"choices": [
+"Both by a forward pass through the trained network",
+"Parametric: re-optimise all $\\theta$; non-parametric: forward pass",
+"Parametric: forward pass $f(x_\\text{new};\\theta)$; non-parametric: re-optimise",
+"Neither can embed new points"
+],
+"answer": 2,
+"why": "Parametric UMAP learns a map $f(\\cdot;\\theta)$, so new points cost one forward pass and are embedded smoothly. Non-parametric UMAP has a free $z_i$ per training point and no map, so a new point needs a new optimisation.",
+"zh": "参数化 UMAP 学到映射 $f$，新点只需前向传播；非参数版本需重新优化。"
+},
+{
 "id": "L03-001",
 "lec": "L03",
 "type": "term",
@@ -2400,6 +2432,38 @@ window.QUESTIONS = [
 "zh": "$\\sigma$ 翻倍 $\\Rightarrow$ $\\lambda=\\sigma^2/\\tau^2$ 变4倍：更不信数据，解向0收缩更多。"
 },
 {
+"id": "L05-031",
+"lec": "L05",
+"type": "calc",
+"level": 2,
+"q": "CT toy with two pixels and one ray that sees only pixel 1: $X=(1,0)^T$ ($p=2$, $n=1$), $y=3$. Ridge $\\hat w=(XX^T+\\lambda I)^{-1}Xy$ at $\\lambda=1$ is",
+"choices": [
+"$(3,\\ 0)$",
+"$(1.5,\\ 1.5)$",
+"$(1.5,\\ 0)$",
+"$(1,\\ 0)$"
+],
+"answer": 2,
+"why": "$XX^T+I=\\operatorname{diag}(2,1)$ and $Xy=(3,0)^T$, so $\\hat w=(1.5,0)^T$. Pixel 2 is in the null space of the measurement and stays exactly 0 for every $\\lambda$. A is the $\\lambda\\to0$ limit.",
+"zh": "$\\hat w=(1.5,0)$：未被测量的像素（零空间）对任意 $\\lambda$ 恒为 0。"
+},
+{
+"id": "L05-032",
+"lec": "L05",
+"type": "calc",
+"level": 3,
+"q": "CT toy: one ray sees only pixel 1, $X=(1,0)^T$, true image $w^*=(3,2)$, noiseless $y=3$, $\\lambda\\to0$ so $\\hat w=(3,0)$. Data residual $\\lVert y-X^T\\hat w\\rVert^2$ and image error $\\lVert\\hat w-w^*\\rVert^2$?",
+"choices": [
+"$0$ and $0$",
+"$0$ and $4$",
+"$0$ and $2$",
+"$9$ and $13$"
+],
+"answer": 1,
+"why": "$X^T\\hat w=3=y$, so the residual is 0, but $\\hat w_2=0$ misses $w^*_2=2$: error $=2^2=4$. The residual cannot see null-space components. C forgets to square, D is $\\hat w=0$.",
+"zh": "残差为 0 但图像误差为 4：残差看不见零空间分量。"
+},
+{
 "id": "L06-001",
 "lec": "L06",
 "type": "term",
@@ -3360,6 +3424,70 @@ window.QUESTIONS = [
 "zh": "训练误差从0单调上升；CV误差呈U形，最优k在中间。"
 },
 {
+"id": "L07-031",
+"lec": "L07",
+"type": "calc",
+"level": 2,
+"q": "Two binary trees with $k=5$ internal nodes each: a balanced one (depth 3) and a chain (depth 5, each node has one leaf child). Maximum number of regions each cuts feature space into?",
+"choices": [
+"6 and 6",
+"8 and 6",
+"6 and 5",
+"5 and 5"
+],
+"answer": 0,
+"why": "A binary tree with $k$ internal nodes has exactly $k+1=6$ leaves for any topology, and one region per leaf. Topology changes only the depth (number of constraints per box) and evaluation cost, not the count.",
+"zh": "$k$ 个内部节点的二叉树恒有 $k+1$ 个叶子，与拓扑无关。"
+},
+{
+"id": "L07-032",
+"lec": "L07",
+"type": "calc",
+"level": 3,
+"q": "A decision DAG: root $\\to$ nodes $A,B$; both $A$ and $B$ send one branch to $C$ and one to $D$; $C,D$ each have two leaves ($k=5$ internal nodes, 4 leaves). Many features are available. Cells, and cells per leaf?",
+"choices": [
+"4 cells, 1 per leaf",
+"6 cells, 1 or 2 per leaf",
+"5 cells, 1 per leaf",
+"8 cells, 2 per leaf"
+],
+"answer": 3,
+"why": "Cells are root-to-leaf paths: $2\\cdot2\\cdot2=8$ (a tree with 5 nodes gives 6). The 8 paths end on 4 leaves, so each leaf collects 2 disjoint cells with a common prediction.",
+"zh": "DAG 的单元数 = 根到叶的路径数 $=8$，4 个叶子各收 2 个单元。"
+},
+{
+"id": "L07-033",
+"lec": "L07",
+"type": "term",
+"level": 3,
+"q": "Why is training a decision DAG harder than greedy training of a tree?",
+"choices": [
+"Each node is trained on fewer samples than in a tree",
+"A DAG cannot reach zero training error",
+"Shared children get data from several parents and edges are learned: coupled splits",
+"A DAG needs more leaves than a tree with the same number of nodes"
+],
+"answer": 2,
+"why": "In a tree a node's data is fixed by its single parent, so greedy node-by-node splitting works. In a DAG the best split at a parent depends on what the shared child does, and vice versa; the routing of branches is also a discrete choice.",
+"zh": "DAG 训练耦合：共享子节点收到多个父节点的数据，且连边也要学。"
+},
+{
+"id": "L07-034",
+"lec": "L07",
+"type": "calc",
+"level": 3,
+"q": "A decision DAG: root → $A,B$; both $A$ and $B$ → $C,D$; $C,D$ → 2 leaves each (5 nodes, 8 root-to-leaf paths). It is used on data with only **one** feature $x$. At most how many distinct regions can it induce on the $x$-axis?",
+"choices": [
+"8",
+"6",
+"4",
+"5"
+],
+"answer": 1,
+"why": "With one feature every node tests $x<t$, so the cells are intervals cut by at most 5 thresholds: at most $5+1=6$ intervals. The count 8 needs different nodes to test different features, so that all path cells are non-empty.",
+"zh": "只有一个特征时 5 个阈值至多切成 6 段，8 个单元需要各节点用不同特征。"
+},
+{
 "id": "L08-001",
 "lec": "L08",
 "type": "term",
@@ -3840,6 +3968,70 @@ window.QUESTIONS = [
 "zh": "一维扫描在对角山脊上会卡住；BO的联合GP代理模型可沿山脊采样。"
 },
 {
+"id": "L08-031",
+"lec": "L08",
+"type": "calc",
+"level": 2,
+"q": "Noise-free GP, two sites, $K=\\begin{pmatrix}1&0.6\\\\0.6&1\\end{pmatrix}$. The kriging weights $\\lambda_x=K^{-1}k_x$ for a prediction point $x$ placed exactly at site 1 (so $k_x=(1,0.6)^T$) are",
+"choices": [
+"$(1,\\ 0.6)$",
+"$(1,\\ -0.6)$",
+"$(1,\\ 0)$",
+"$(0.625,\\ 0.375)$"
+],
+"answer": 2,
+"why": "$k_x$ is the first column of $K$, i.e. $k_x=Ke_1$, so $\\lambda_x=K^{-1}Ke_1=e_1$: $\\lambda_i(t_j)=\\delta_{ij}$ and the mean interpolates, $\\mu=y_1$. A forgets $K^{-1}$.",
+"zh": "站点处 $k_x=Ke_1$，所以 $\\lambda=e_1$：权重 $\\lambda_i(t_j)=\\delta_{ij}$。"
+},
+{
+"id": "L08-032",
+"lec": "L08",
+"type": "calc",
+"level": 3,
+"q": "Noise-free GP, $K=\\begin{pmatrix}1&0.6\\\\0.6&1\\end{pmatrix}$, $k(x,x)=1$, $y=(2,4)^T$, new point with $k_x=(0.6,0.6)^T$. Posterior mean and kriging variance $s^2=k(x,x)-k_x^TK^{-1}k_x$ are",
+"choices": [
+"$3$ and $0.55$",
+"$2.25$ and $0.55$",
+"$2.25$ and $0.28$",
+"$2.25$ and $0.45$"
+],
+"answer": 1,
+"why": "$K\\lambda=k_x$ gives $\\lambda=(0.375,0.375)$, so $\\mu=0.375\\cdot6=2.25$ and $s^2=1-0.6\\cdot0.75=0.55$. A uses equal weights $\\tfrac12$ (ignores redundancy), C forgets $K^{-1}$ ($1-0.72$), D is $k_x^TK^{-1}k_x$ alone.",
+"zh": "$\\lambda=(0.375,0.375)$：均值 $2.25$，克里金方差 $1-0.45=0.55$。"
+},
+{
+"id": "L08-033",
+"lec": "L08",
+"type": "pic",
+"level": 2,
+"q": "In a GP demo you drag one measurement **site** sideways, keeping its measured value $y_i$ fixed. What changes in the prediction?",
+"choices": [
+"Only the mean; weights and band are fixed by the kernel",
+"Mean, error band and kriging weights $\\lambda_i(t)$ may all change",
+"Nothing, since $y_i$ is unchanged",
+"Only the error band; the mean depends on $y$ alone"
+],
+"answer": 1,
+"why": "$\\lambda=K^{-1}k_*$ and $\\sigma_*^2$ depend on the site locations through $K$ and $k_*$; $\\mu=\\lambda^Ty$ then changes too. Moving only a value $y_i$ changes just $\\mu$ (linearly), not $\\lambda$ or $\\sigma_*^2$.",
+"zh": "移动站点位置改变 $K,k_*$，所以权重、方差、均值都变；只改 $y$ 仅均值变。"
+},
+{
+"id": "L08-034",
+"lec": "L08",
+"type": "calc",
+"level": 2,
+"q": "One site, kernel $k(x,x)=1$, noise variance $\\tau^2=1$, observed $y=2$. At the site itself ($k_*=1$) the posterior mean $k_*^T(K+\\tau^2I)^{-1}y$ and the variance of $f$, $1-k_*^T(K+\\tau^2I)^{-1}k_*$, are",
+"choices": [
+"$2$ and $0$",
+"$2$ and $0.5$",
+"$1$ and $0$",
+"$1$ and $0.5$"
+],
+"answer": 3,
+"why": "$(K+\\tau^2)^{-1}=\\tfrac12$, so $\\mu=\\tfrac12\\cdot2=1$ and $s^2=1-\\tfrac12=0.5$. With a nugget the mean no longer interpolates ($\\mu\\neq y$) and the variance at a site stays above 0; A is the noise-free result.",
+"zh": "有 nugget 时站点处均值 $=1\\ne y=2$，方差 $0.5>0$：不再插值。"
+},
+{
 "id": "L09-001",
 "lec": "L09",
 "type": "term",
@@ -3900,7 +4092,7 @@ window.QUESTIONS = [
 "$X(\\mu-y)$"
 ],
 "answer": 3,
-"why": "The factors $\\mu_i(1-\\mu_i)$ from $\\sigma'$ cancel against the denominator of $\\partial e_i/\\partial\\mu_i$, leaving \"features times residual\". A is not even a conformable product ($n\\times p$ times $\\mathbb R^n$ gives a wrong shape), B has the wrong sign.",
+"why": "The factors $\\mu_i(1-\\mu_i)$ from $\\sigma'$ cancel against the denominator of $\\partial e_i/\\partial\\mu_i$, leaving \"features times residual\". A is not conformable ($X^T$ is $n\\times p$, $\\mu-y$ has length $n$), B has the wrong sign.",
 "zh": "交叉熵梯度 $\\nabla_wE=X(\\mu-y)$：特征$\\times$残差，$\\sigma'$ 因子被约掉。"
 },
 {
@@ -4205,7 +4397,7 @@ window.QUESTIONS = [
 ],
 "answer": 2,
 "why": "$w=(\\mu_1-\\mu_2)/\\sigma^2=2$ and $w_0=-(\\mu_1^2-\\mu_2^2)/(2\\sigma^2)=-(9-1)/2=-4$, so the boundary $x=2$ is the midpoint. A forgets the factor $\\tfrac12$, B and D flip a sign.",
-"zh": "LDA$\\to$sigmoid：$w=(\\mu_1-\\mu_2)/\\sigma^2=2$，$w_0=-(\\mu_1^2-\\mu_2^2)/2\\sigma^2=-4$，边界在中点。"
+"zh": "LDA$\\to$sigmoid：$w=(\\mu_1-\\mu_2)/\\sigma^2=2$，$w_0=-4$，边界在均值中点。"
 },
 {
 "id": "L09-024",
@@ -4416,6 +4608,214 @@ window.QUESTIONS = [
 "zh": "先验变化只改偏置：加 $\\ln(\\pi_1'/\\pi_0')$，边界平行移动、信号区缩小。"
 },
 {
+"id": "L09-037",
+"lec": "L09",
+"type": "pic",
+"level": 2,
+"q": "Least squares on 0/1 labels is maximum likelihood under Gaussian noise $y=x^Tw+\\varepsilon$. Which flaw is real for a binary label?",
+"choices": [
+"True variance is $\\mu(1-\\mu)$, not constant; Gaussian mass lies outside $\\{0,1\\}$",
+"The squared-error loss is non-convex in $w$, so training gets stuck",
+"The normal equations have no closed-form solution for binary $y$",
+"Bernoulli noise has constant variance, but the Gaussian one does not"
+],
+"answer": 0,
+"why": "A Bernoulli label has variance $\\mu(1-\\mu)$: zero far from the boundary, maximal ($\\tfrac14$) at $\\mu=\\tfrac12$, and it cannot leave $\\{0,1\\}$. OLS is convex with a closed form (B, C wrong), and its assumed variance is the constant one (D is reversed).",
+"zh": "OLS 假设高斯噪声：方差恒定且可取 0/1 之外的值；真实伯努利方差 $\\mu(1-\\mu)$。"
+},
+{
+"id": "L09-038",
+"lec": "L09",
+"type": "calc",
+"level": 2,
+"q": "A logistic model $\\mu=\\sigma(v^Tu+b)$ with $v=(1,2)^T$, $b=-2$ (units: cm). What is the distance of the boundary $\\mu=\\tfrac12$ from the origin?",
+"choices": [
+"$2.00$ cm",
+"$0.89$ cm",
+"$0.45$ cm",
+"$1.79$ cm"
+],
+"answer": 1,
+"why": "The boundary is $u_1+2u_2=2$, so $d=|b|/\\|v\\|=2/\\sqrt5=0.894$. A forgets to normalise by $\\|v\\|$, C is $1/\\|v\\|$ (the spacing per unit score), D is $4/\\sqrt5$.",
+"zh": "边界 $v^Tu+b=0$ 到原点距离 $|b|/\\lVert v\\rVert=2/\\sqrt5$。"
+},
+{
+"id": "L09-039",
+"lec": "L09",
+"type": "calc",
+"level": 2,
+"q": "Same model, $\\mu=\\sigma(u_1+2u_2-2)$. What is the distance between the boundary $\\mu=\\tfrac12$ and the level line $\\mu=0.9$? ($\\ln9\\approx2.20$)",
+"choices": [
+"$0.44$",
+"$2.20$",
+"$0.98$",
+"$1.10$"
+],
+"answer": 2,
+"why": "The line $\\mu=0.9$ is where the score equals $\\operatorname{logit}0.9=\\ln9=2.20$; the score changes by $\\|v\\|=\\sqrt5$ per unit length, so the distance is $2.20/\\sqrt5=0.98$. A divides by $\\|v\\|^2=5$, D by $2$, B ignores the geometry.",
+"zh": "得分差 $\\ln 9$ 除以 $\\lVert v\\rVert=\\sqrt5$，距离 $0.98$。"
+},
+{
+"id": "L09-040",
+"lec": "L09",
+"type": "term",
+"level": 2,
+"q": "Poisson regression, $\\mu_i=e^{x_i^Tw}$, negative log-likelihood $E=\\sum_i(\\mu_i-y_i\\ln\\mu_i)$ + const. Which is $\\nabla_wE$?",
+"choices": [
+"$X\\operatorname{diag}(\\mu_i)(\\mu-y)$",
+"$X^T(\\mu-y)$",
+"$X(y-\\mu)$",
+"$X(\\mu-y)$"
+],
+"answer": 3,
+"why": "$\\partial E/\\partial w=\\sum_i(\\mu_i-y_i)x_i^T$, since $\\partial\\mu_i/\\partial w=\\mu_ix_i^T$ and $y_i\\ln\\mu_i=y_ix_i^Tw$. The same form as for logistic regression (canonical link). A keeps a spurious $\\mu_i$, B is not conformable, C has the wrong sign.",
+"zh": "典范链接下梯度恒为 $X(\\mu-y)$：特征乘残差。"
+},
+{
+"id": "L09-041",
+"lec": "L09",
+"type": "term",
+"level": 3,
+"q": "Same Poisson regression with log link, $\\mu_i=e^{x_i^Tw}$. Which is the Hessian of $E$, showing that $E$ is convex?",
+"choices": [
+"$X\\operatorname{diag}(\\mu_i)X^T$",
+"$XX^T$",
+"$X\\operatorname{diag}(\\mu_i-y_i)X^T$",
+"$X\\operatorname{diag}(1/\\mu_i)X^T$"
+],
+"answer": 0,
+"why": "Differentiating $\\nabla E=\\sum_i(\\mu_i-y_i)x_i$ gives $\\sum_i\\mu_ix_ix_i^T$ with weights $\\mu_i>0$, so $H\\succeq0$. C contains the residual, which can be negative and would not give convexity. B ignores $\\partial\\mu_i/\\partial w$.",
+"zh": "$H=X\\,\\mathrm{diag}(A''(\\eta_i))X^T$，泊松时权重为 $\\mu_i>0$，故凸。"
+},
+{
+"id": "L09-042",
+"lec": "L09",
+"type": "calc",
+"level": 3,
+"q": "1-D data $x_1=-1,y_1=0$ and $x_2=+1,y_2=1$, model $\\mu=\\sigma(wx)$, cross-entropy $E$. One **Newton** step from $w=0$ gives $w=$",
+"choices": [
+"$1$",
+"$2$",
+"$4$",
+"$0.5$"
+],
+"answer": 1,
+"why": "At $w=0$ all $\\mu_i=\\tfrac12$: $E'=\\sum(\\mu_i-y_i)x_i=-\\tfrac12-\\tfrac12=-1$ and $E''=\\tfrac14(1+1)=\\tfrac12$, so $w=0-(-1)/(\\tfrac12)=2$. A is a plain gradient step with $\\eta=1$; D uses $E''=\\sum x_i^2=2$ without the weights $\\tfrac14$, giving $w=0.5$.",
+"zh": "牛顿步 $w=-E'/E''=1/0.5=2$（梯度步 $\\eta=1$ 只得 1）。"
+},
+{
+"id": "L09-043",
+"lec": "L09",
+"type": "term",
+"level": 2,
+"q": "Newton's method on the logistic negative log-likelihood can be rewritten as repeated *weighted* least squares (IRLS). What are the weights of sample $i$?",
+"choices": [
+"The residual $\\mu_i-y_i$",
+"$1/\\big(\\mu_i(1-\\mu_i)\\big)$",
+"$\\mu_i(1-\\mu_i)$",
+"Uniform, $1/n$"
+],
+"answer": 2,
+"why": "The Hessian is $XSX^T$ with $S=\\operatorname{diag}(\\mu_i(1-\\mu_i))$, and these are the weights of the least-squares problem. Confidently classified points ($\\mu_i\\approx0$ or $1$) get small weight; B would amplify exactly those points.",
+"zh": "IRLS 权重 $\\mu_i(1-\\mu_i)$：自信分类的点权重小。"
+},
+{
+"id": "L09-044",
+"lec": "L09",
+"type": "pic",
+"level": 3,
+"q": "Two 1-D classes $\\mathcal N(\\mu_k,\\sigma_k^2)$ with $\\sigma_1\\ne\\sigma_2$. What is the log-odds $\\ln\\frac{p(1\\mid x)}{p(2\\mid x)}$ as a function of $x$?",
+"choices": [
+"Linear in $x$, boundary at the midpoint of the means",
+"Quadratic in $x$, yet plain logistic regression on $x$ is still exact",
+"Linear in $x$, with the boundary shifted towards the broader class",
+"Quadratic: up to two boundary points; exact with features $(x,x^2)$"
+],
+"answer": 3,
+"why": "The $x^2$ terms no longer cancel, so the log-odds is quadratic (QDA). Logistic regression on $x$ alone is then misspecified (B wrong), but on $(x,x^2)$ the posterior is again a sigmoid of a linear function. A and C hold only for equal variances.",
+"zh": "方差不等时 $x^2$ 项不再抵消：对数几率二次（QDA），用特征 $(x,x^2)$ 可恢复。"
+},
+{
+"id": "L09-045",
+"lec": "L09",
+"type": "calc",
+"level": 3,
+"q": "Separable 1-D data $x=\\mp1$, $y=0,1$, $\\mu=\\sigma(wx)$, gradient flow from $w=0$ with $\\dot w=2\\sigma(-w)\\approx2e^{-w}$. Roughly what is $w$ at $t=10^3$? ($\\ln2000\\approx7.6$)",
+"choices": [
+"$7.6$",
+"$1000$",
+"$6.9$",
+"$2.0$"
+],
+"answer": 0,
+"why": "$\\frac{d}{dt}e^{w}\\approx2$, so $e^{w}\\approx2t$ and $w\\approx\\ln(2t)=\\ln2000=7.6$: logarithmic growth, no finite minimiser. B assumes constant slope, C forgets the factor 2, D is a ridge-like finite solution.",
+"zh": "$e^{w}\\approx2t$，$w\\approx\\ln(2t)$：可分数据上 $\\lVert w\\rVert\\sim\\ln t$。"
+},
+{
+"id": "L09-046",
+"lec": "L09",
+"type": "pic",
+"level": 2,
+"q": "A 3-class classifier has scores $s=(1,2,3)$ and $\\beta=1$. All scores are multiplied by 10: $s=(10,20,30)$. What changes?",
+"choices": [
+"Nothing, softmax is invariant under rescaling",
+"Probabilities become sharper (nearly one-hot); the predicted class stays the same",
+"The predicted class changes to class 1",
+"Probabilities become uniform"
+],
+"answer": 1,
+"why": "Rescaling $s\\to10s$ equals $\\beta\\to10\\beta$: low temperature, $\\mu\\approx(0,0,1)$. The ordering of the scores, hence the argmax and the class boundaries, is unchanged. Only a common *shift* $s+c\\mathbf1$ leaves $\\mu$ invariant (A).",
+"zh": "缩放得分等价于增大 $\\beta$：更尖锐但类别不变；只有平移才使概率不变。"
+},
+{
+"id": "L09-047",
+"lec": "L09",
+"type": "term",
+"level": 3,
+"q": "The maximal value of $z^Ts+\\tfrac1\\beta H(z)$ over the simplex $\\Delta_K$ (attained at $\\operatorname{softmax}(\\beta s)$) equals",
+"choices": [
+"$\\max_ks_k$",
+"$\\ln\\sum_ke^{\\beta s_k}$",
+"$\\beta^{-1}\\ln\\sum_ke^{\\beta s_k}$",
+"$\\sum_k\\operatorname{softmax}(\\beta s)_k\\,s_k$"
+],
+"answer": 2,
+"why": "With $Z=\\sum_je^{\\beta s_j}$ and $H=-\\beta z^Ts+\\ln Z$ at the optimum, the value is $z^Ts+\\tfrac1\\beta(-\\beta z^Ts+\\ln Z)=\\beta^{-1}\\ln Z$, the smooth max. D is only the energy term, B misses $1/\\beta$, A is the $\\beta\\to\\infty$ limit.",
+"zh": "最优值 $=\\beta^{-1}\\ln\\sum e^{\\beta s_k}$，即光滑最大值（log-sum-exp）。"
+},
+{
+"id": "L09-048",
+"lec": "L09",
+"type": "pic",
+"level": 2,
+"q": "Why is the logistic cross-entropy $E(w)$ convex, so that every local minimum is global?",
+"choices": [
+"$\\sigma$ is a convex function and sums of convex functions are convex",
+"$XSX^T$ is positive definite for any data, so a minimiser always exists",
+"$E\\ge0$ is bounded below, which makes it convex",
+"$v^THv=\\sum_i\\mu_i(1-\\mu_i)(v^Tx_i)^2\\ge0$ for every $v$"
+],
+"answer": 3,
+"why": "The Hessian is a sum of weighted $x_ix_i^T$ with weights $\\mu_i(1-\\mu_i)>0$, hence positive semi-definite. B is false: on separable data $E\\to0$ without a minimiser. $\\sigma$ itself is not convex, and boundedness does not imply convexity.",
+"zh": "$H=XSX^T\\succeq0$ 故凸；但凸不保证最小值存在（可分数据）。"
+},
+{
+"id": "L09-049",
+"lec": "L09",
+"type": "pic",
+"level": 2,
+"q": "In a 2-D logistic model $\\mu=\\sigma(v^Tu+b)$ with $v=(3,4)^T$ the bias is raised from $b=0$ to $b=5$. What happens to the boundary?",
+"choices": [
+"It moves 1 unit opposite to $v$, keeping orientation; the class-1 side grows",
+"It moves 1 unit along $v$, keeping orientation; the class-1 side grows",
+"It moves 5 units opposite to $v$; the class-1 side grows",
+"It rotates, the spacing of the level lines is unchanged"
+],
+"answer": 0,
+"why": "The boundary $v^Tu=-5$ is a parallel line at distance $b/\\|v\\|=5/5=1$ from the origin on the $-v$ side, so the region $v^Tu+b>0$ (class 1) grows. C forgets the division by $\\|v\\|$; only $v$ changes orientation or spacing.",
+"zh": "偏置 $b$ 使等值线沿 $-v$ 方向平移 $b/\\lVert v\\rVert$，方向与间距不变。"
+},
+{
 "id": "L10-001",
 "lec": "L10",
 "type": "term",
@@ -4620,7 +5020,7 @@ window.QUESTIONS = [
 "$47$"
 ],
 "answer": 2,
-"why": "$4\\cdot(5+1)+3\\cdot(4+1)+1\\cdot(3+1)=24+15+4=43$. A forgets all biases ($20+12+3$), B counts biases only in the first two layers, D uses the transposed count $\\sum d_{l-1}(d_l+1)$.",
+"why": "$4\\cdot(5+1)+3\\cdot(4+1)+1\\cdot(3+1)=24+15+4=43$. A forgets all biases ($20+12+3$), B keeps only the first layer's biases ($35+4$), D uses the transposed count $\\sum d_{l-1}(d_l+1)$.",
 "zh": "参数数$=4\\times6+3\\times5+1\\times4=43$（每单元 $d_{l-1}$ 个权重 + 1 个偏置）。"
 },
 {
@@ -4916,7 +5316,7 @@ window.QUESTIONS = [
 "lec": "L10",
 "type": "pic",
 "level": 3,
-"q": "$h_3=|2|2|x|-1|-1|$ on $x\\in[-1,1]$ is a sawtooth in $[0,1]$. A threshold at height $t=0.5$ is crossed how many times, versus a single layer of 3 $|\\cdot|$ units?",
+"q": "$h_3=|2|2|x|-1|-1|$ on $x\\in[-1,1]$ is a sawtooth with values in $[0,1]$. A threshold at height $t=0.5$ is crossed how many times, versus a single layer of 3 $|\\cdot|$ units?",
 "choices": [
 "8 times, versus at most 4 pieces (3 kinks)",
 "4 times, versus 3 pieces",
@@ -4972,7 +5372,7 @@ window.QUESTIONS = [
 "A peak at $P\\approx n$, then the error rises forever"
 ],
 "answer": 1,
-"why": "At the interpolation threshold the smallest model fits the training data exactly and variance explodes; beyond it, minimum-norm interpolation acts as implicit regularisation and the error falls again. Note: the lecture slides did not cover this (preview).",
+"why": "At the interpolation threshold the smallest model fits the training data exactly and variance explodes; beyond it, minimum-norm interpolation acts as implicit regularisation and the error falls again. (Covered in L11.)",
 "zh": "双下降：插值阈值 P≈n 处误差出现峰值，之后再次下降。"
 },
 {
@@ -4990,6 +5390,150 @@ window.QUESTIONS = [
 "answer": 0,
 "why": "A nearly square random matrix has some $s_{\\min}\\approx0$, so noise in $y$ along that direction is multiplied by $1/s_{\\min}$. For $P\\gg n$ the smallest nonzero singular value grows again and the minimum-norm choice tames the noise.",
 "zh": "$P\\approx n$ 时最小奇异值接近 0，噪声被 $1/s_k$ 放大 $\\to$ 方差爆炸。"
+},
+{
+"id": "L10-037",
+"lec": "L10",
+"type": "calc",
+"level": 2,
+"q": "Three distinct points on a line, classified by a threshold unit $\\operatorname{sign}(wx+b)$ ($p=2$ weights). How many of the 8 labelings are separable, and which fail?",
+"choices": [
+"8; $p=2$ weights shatter any three points",
+"4; only labelings with exactly one sign change",
+"6; the alternating labelings $(+,-,+)$ and $(-,+,-)$",
+"7; only $(-,+,-)$ fails"
+],
+"answer": 2,
+"why": "$C(3,2)=2(\\binom20+\\binom21)=6$. A single threshold allows at most one sign change along the line, so the two alternating labelings fail. B forgets the two \"all equal\" labelings; D forgets the mirror image $(+,-,+)$.",
+"zh": "线上 3 点：$C(3,2)=6$，交替标记 $+-+$、$-+-$ 不可分。"
+},
+{
+"id": "L10-038",
+"lec": "L10",
+"type": "calc",
+"level": 2,
+"q": "Cover's recursion $C(n+1,p)=C(n,p)+C(n,p-1)$, given $C(5,3)=22$ and $C(5,2)=10$. What is $C(6,3)$?",
+"choices": [
+"$32$",
+"$44$",
+"$52$",
+"$30$"
+],
+"answer": 0,
+"why": "$C(6,3)=C(5,3)+C(5,2)=22+10=32$, which agrees with $2(1+5+10)=32$ and is half of $2^6$ ($n=2p$). B doubles $C(5,3)$ (valid only for $n\\le p$); C uses $C(5,4)$; D uses $C(4,2)$.",
+"zh": "$C(6,3)=C(5,3)+C(5,2)=22+10=32$，正好是 $2^6$ 的一半。"
+},
+{
+"id": "L10-039",
+"lec": "L10",
+"type": "calc",
+"level": 3,
+"q": "Ten points in general position in the plane, classified by a threshold unit with bias ($p=3$ weights). How many of the $2^{10}=1024$ labelings are linearly separable?",
+"choices": [
+"$112$",
+"$46$",
+"$260$",
+"$92$"
+],
+"answer": 3,
+"why": "$C(10,3)=2\\big(\\binom90+\\binom91+\\binom92\\big)=2(1+9+36)=92$, under 9% of 1024. A uses $\\binom{n}{k}$ instead of $\\binom{n-1}{k}$; B lacks the factor 2; C uses $p=4$.",
+"zh": "$C(10,3)=2(1+9+36)=92$，随机标记 $n\\gg2p$ 几乎都不可分。"
+},
+{
+"id": "L10-040",
+"lec": "L10",
+"type": "calc",
+"level": 2,
+"q": "Folding network $h_1=|x|$, $h_l=|2h_{l-1}-1|$ on $x\\in[-1,1]$. For $h_4$: how many kinks, and how often is a generic threshold $t\\in(0,1)$ crossed?",
+"choices": [
+"8 kinks, 8 crossings",
+"15 kinks, 16 crossings",
+"16 kinks, 16 crossings",
+"15 kinks, 15 crossings"
+],
+"answer": 1,
+"why": "Each fold doubles the pieces: $2^4=16$ linear pieces, hence $16-1=15$ kinks. Every piece sweeps $[0,1]$ once, so $t$ is crossed 16 times (pieces, not kinks). A is $h_3$ ($L=3$).",
+"zh": "$L=4$：$2^4=16$ 段、15 个折点，阈值被穿过 16 次。"
+},
+{
+"id": "L10-041",
+"lec": "L10",
+"type": "calc",
+"level": 2,
+"q": "One hidden layer of three ReLU units, $g(x)=\\operatorname{ReLU}(x)-2\\operatorname{ReLU}(x-1)+\\operatorname{ReLU}(x-2)$. What are $g(0.5)$, $g(1)$, $g(3)$?",
+"choices": [
+"$0.5,\\ 1,\\ 0$",
+"$0.5,\\ 1,\\ -1$",
+"$0.5,\\ 1,\\ 3$",
+"$0.5,\\ 0.5,\\ 0$"
+],
+"answer": 0,
+"why": "$g(0.5)=0.5$; $g(1)=1-0+0=1$; $g(3)=3-4+1=0$. $g$ is a triangular bump (rises with slope 1, falls with slope $-1$, then is flat 0): the building block of universal approximation. B drops the third unit, C keeps only the first.",
+"zh": "三个 ReLU 组成三角形\"凸起\"：$g=0.5,\\,1,\\,0$。"
+},
+{
+"id": "L10-042",
+"lec": "L10",
+"type": "calc",
+"level": 3,
+"q": "One hidden layer of $q=4$ ReLU units on a 3-D input (each unit switches on a plane). The maximum number of linear regions is $\\sum_{k=0}^{3}\\binom qk$. Value?",
+"choices": [
+"$16$",
+"$11$",
+"$15$",
+"$5$"
+],
+"answer": 2,
+"why": "$1+4+6+4=15$. Four planes in $\\mathbb R^3$ cannot realise all $2^4=16$ sign patterns (A). B is the 2-D count $1+q+\\binom q2$, D the 1-D count $q+1$.",
+"zh": "三维输入、4 个单元：$1+4+6+4=15$ 个区域，少于 $2^4$。"
+},
+{
+"id": "L10-043",
+"lec": "L10",
+"type": "pic",
+"level": 1,
+"q": "An MLP with scalar input $x$, ReLU hidden layers and a linear output. What does the graph of the output function look like?",
+"choices": [
+"A smooth S-shaped curve",
+"A staircase with jumps",
+"A single straight line, since compositions of linear maps are linear",
+"A continuous polyline whose kinks are where a hidden pre-activation crosses 0"
+],
+"answer": 3,
+"why": "Each ReLU is linear on either side of its switching point, so the network is continuous and piecewise linear, affine between switches. C would hold only without $\\varphi$; a staircase needs step activations.",
+"zh": "ReLU 网络是连续分段线性函数，折点在隐单元预激活为 0 处。"
+},
+{
+"id": "L10-044",
+"lec": "L10",
+"type": "calc",
+"level": 2,
+"q": "Higgs net: $p=28$ inputs, two hidden layers of 300 units, one output unit, every unit with a bias. How many parameters?",
+"choices": [
+"$98\\,700$",
+"$99\\,301$",
+"$99\\,328$",
+"$99\\,300$"
+],
+"answer": 1,
+"why": "$300\\cdot29+300\\cdot301+1\\cdot301=8700+90\\,300+301=99\\,301$. A forgets all biases ($8400+90\\,000+300$), C uses the transposed count $\\sum d_{l-1}(d_l+1)$, D forgets the output bias.",
+"zh": "参数数 $=8700+90300+301=99301$（每层 $d_l(d_{l-1}+1)$）。"
+},
+{
+"id": "L10-045",
+"lec": "L10",
+"type": "term",
+"level": 2,
+"q": "$f(x)=c_d\\sum_{j=1}^da_j\\varphi(w_j^Tx+b_j)$ with i.i.d. zero-mean $a_j$. Which prefactor $c_d$ gives a non-degenerate Gaussian process as $d\\to\\infty$?",
+"choices": [
+"$c_d=1$",
+"$c_d=1/d$",
+"$c_d=1/\\sqrt d$",
+"$c_d=d$"
+],
+"answer": 2,
+"why": "The variance is $c_d^2\\,d\\,\\sigma_a^2\\,\\mathbb E[\\varphi^2]$, finite and non-zero only for $c_d^2d=$ const. With $c_d=1$ it grows like $d$, with $1/d$ it vanishes like $1/d$ ($f\\to0$), with $d$ it explodes.",
+"zh": "CLT 要求 $1/\\sqrt d$ 缩放，方差才有限且非零。"
 },
 {
 "id": "L11-001",
@@ -10238,6 +10782,38 @@ window.QUESTIONS = [
 "answer": 1,
 "why": "The gradient is perpendicular to contours, which in an elongated ellipse does not point at the minimum. $\\eta<2/\\lambda_1$ is set by the stiff direction, so the flat one decays only like $(1-\\eta\\lambda_2)^k$. Cure: momentum, preconditioning, Adam.",
 "zh": "梯度垂直于等高线，细长山谷中呈之字形、沿谷底缓慢前进（条件数大）。"
+},
+{
+"id": "A6-013",
+"lec": "A6",
+"type": "calc",
+"level": 3,
+"q": "$a(t)=t^2$ and $g(x)=x^2-1$ are both convex. The composition $(a\\circ g)(x)=(x^2-1)^2$ has second derivative $(a\\circ g)''=a''(g)\\,g'^2+a'(g)\\,g''$. Its value at $x=0$ is",
+"choices": [
+"$4$",
+"$0$",
+"$12$",
+"$-4$"
+],
+"answer": 3,
+"why": "At $x=0$: $g=-1$, $g'=0$, $g''=2$, so $a''g'^2=0$ and $a'(g)g''=2(-1)\\cdot2=-4<0$. Not convex: $a$ is convex but **not non-decreasing** (decreasing for $t<0$), which the rule requires.",
+"zh": "$a\\circ g$ 凸需 $a$ 凸且单调不减；此例 $a$ 在 $t<0$ 递减，二阶导 $=-4$。"
+},
+{
+"id": "A6-014",
+"lec": "A6",
+"type": "pic",
+"level": 2,
+"q": "Input-convex network layer $z_3=a(W^2a(x))$, $a=$ softplus (convex, increasing), $W^2=-1$. Which statement is right?",
+"choices": [
+"Convex: $a$ is convex and increasing, so any composition is convex",
+"Not convex: $-a(x)$ is concave, and a convex outer $a$ does not repair that",
+"Convex: a composition of two convex functions is convex",
+"Convex whenever the biases are non-negative"
+],
+"answer": 1,
+"why": "The rule needs a convex inner function; with $W^2<0$ the inner $-a(x)$ is concave. Indeed $z_3$ is strictly decreasing and bounded, which no convex function on $\\mathbb R$ can be. Hence non-negative weights are required.",
+"zh": "内层 $-a(x)$ 是凹的，复合不凸；故深层权重须非负，$a$ 凸且不减。"
 },
 {
 "id": "A7-001",
